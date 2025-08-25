@@ -4,8 +4,6 @@ import com.example.UberReviewService.models.Review;
 import com.example.UberReviewService.repositories.ReviewRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -25,13 +23,13 @@ public class ReviewService implements CommandLineRunner {
                 .builder()
                 .content("Great ride!")
                 .rating(4.5)
-                .createdAt(new Date())
-                .updatedAt(new Date())
                 .build();
 
-        System.out.println(r);
-
         reviewRepository.save(r); // this code execute sql queries
+
+        System.out.println(r.getId());
+
+
 
     }
 }
