@@ -13,9 +13,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class Booking extends BaseModel{
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}) // cascade will save the review object when booking object is saved and delete the review object when booking object is deleted
-    private Review review; // Composition -- has a relationship
-
     @Enumerated(value=EnumType.STRING)
     private BookingSatus bookingStatus;
 

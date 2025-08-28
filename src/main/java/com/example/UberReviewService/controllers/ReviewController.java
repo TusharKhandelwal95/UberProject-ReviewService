@@ -1,5 +1,8 @@
 package com.example.UberReviewService.controllers;
 
+import com.example.UberReviewService.adapters.CreateReviewDtoToReviewAdapter;
+import com.example.UberReviewService.dtos.CreateReviewDto;
+import com.example.UberReviewService.dtos.SendReviewDto;
 import com.example.UberReviewService.models.Review;
 import com.example.UberReviewService.services.ReviewService;
 import org.springframework.http.HttpStatus;
@@ -11,15 +14,27 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/v1/reviews")
 public class ReviewController {
+
     private ReviewService reviewService;
-    public ReviewController(ReviewService reviewService){
+    private CreateReviewDtoToReviewAdapter adapter;
+
+    public ReviewController(ReviewService reviewService, CreateReviewDtoToReviewAdapter adapter) {
+        this.adapter = adapter;
         this.reviewService = reviewService;
     }
 
     @PostMapping
-    public ResponseEntity<Review> publishReview(@RequestBody Review request) {
-        Review review = this.reviewService.publishReview(request);
-        return new ResponseEntity<>(review, HttpStatus.CREATED);
+    public ResponseEntity<?> publishReview(@RequestBody CreateReviewDto request) {
+        Review incomingReview = this.adapter.convertDto(request);
+        if(incomingReview == null) return new ResponseEntity<>("Invalid arguments", HttpStatus.BAD_REQUEST);
+        Review review = this.reviewService.publishReview(incomingReview);
+        SendReviewDto sendingReview = SendReviewDto
+                .builder()
+                .content(review.getContent())
+                .rating(review.getRating())
+                .bookingId(review.getBooking().getId())
+                .build();
+        return new ResponseEntity<>(sendingReview, HttpStatus.CREATED);
     }
 
     @GetMapping

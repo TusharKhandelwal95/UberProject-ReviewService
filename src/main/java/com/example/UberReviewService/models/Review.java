@@ -2,6 +2,7 @@ package com.example.UberReviewService.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
@@ -20,6 +21,10 @@ public class Review extends BaseModel {
 
     private Double rating;
 
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(nullable = false)
+    private Booking booking;
+
     @Override
     public String toString() {
         return "Review{" +
@@ -28,6 +33,7 @@ public class Review extends BaseModel {
                 ", rating=" + rating +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", booking=" + booking +
                 '}';
     }
 }
