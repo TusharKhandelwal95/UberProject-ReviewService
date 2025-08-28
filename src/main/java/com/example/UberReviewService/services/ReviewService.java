@@ -9,9 +9,8 @@ import com.example.UberReviewService.repositories.ReviewRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 
 
 @Service
@@ -28,6 +27,7 @@ public class ReviewService implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
         System.out.print("********************************");
 
@@ -64,7 +64,26 @@ public class ReviewService implements CommandLineRunner {
 //            }
 //        }
 
-        Optional<Driver> fetchedDriver = driverRepository.hqlFindByIdAndLicenseNumber(1L, "DL123456");
-        System.out.println(fetchedDriver.get().getName());
+        /*
+        * Handling N+1 problem
+        * Suppose for a list of driver id we have to find bookings for all of them
+        * So we would make 1 call to get all driver data then we will make N calls for each driver's booking
+        *
+        * To prevent it we can
+        * 1..  Get all driver(1 call) --> get booking of all drivers using join(2nd call)
+        * 2.. Get all driver(1 call) --> then use @fetch in driver class then use loop.
+        * also make function @Transactional so that session is open till the end of function
+        * */
+        List<Long> driverIds = new ArrayList<>(Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L));
+        List<Driver> drivers = driverRepository.findByIdIn(driverIds);
+
+//        1..
+//        List<Booking> bookings = bookingRepository.findAllByDriverIn(drivers);
+//        2..
+        for(Driver driver : drivers){
+            List<Booking> bookings = driver.getBookings(); // LAZY loading happens here but no n+1 problem because of @Fetch
+            System.out.println(driver.getName() + " : " + bookings.size() + " bookings.");
+            bookings.forEach(booking -> System.out.println(booking.getId()));
+        }
     }
 }
