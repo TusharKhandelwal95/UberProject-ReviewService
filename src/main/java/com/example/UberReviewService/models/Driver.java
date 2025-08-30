@@ -22,6 +22,11 @@ public class Driver extends BaseModel{
 
     private String licenseNumber;
 
+
+    private String phoneNumber;
+
+    private String address;
+
     //1:n Driver : Bookings
     @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY) // mappedBy should be the name of the attribute in the Booking class that owns the relationship
     // fetchType LAZY means that the bookings will be loaded only when they are accessed for the first time
